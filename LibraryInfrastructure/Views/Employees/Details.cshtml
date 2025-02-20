@@ -1,0 +1,55 @@
+﻿@model LibraryDomain.Models.Employee
+
+@{
+    ViewData["Title"] = "Деталі по працівниках";
+}
+
+<h2>Employee: @Model.FullName</h2>
+<p>Department: @(Model.Department?.DepartmentName ?? "None")</p>
+<p>Lab: @(Model.Lab?.LabNumber ?? "None")</p>
+<!-- etc. -->
+
+<hr />
+
+<h3>Детилі по працівниках</h3>
+@if (Model.Positions != null && Model.Positions.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Position Name</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pos in Model.Positions)
+            {
+                <tr>
+                    <td>@pos.PositionName</td>
+                    <td>@pos.StartDate</td>
+                    <td>@pos.EndDate</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No positions found.</p>
+}
+
+<!-- Link to create a new Position for this employee -->
+<p>
+    <a asp-controller="Positions"
+       asp-action="Create"
+       asp-route-employeeId="@Model.Id"
+       class="btn btn-primary">
+        Add Position
+    </a>
+</p>
+
+<hr />
+
+<!-- Back to list, edit, etc. -->
+<a asp-action="Index">Повернутись до списку</a>
