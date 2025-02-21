@@ -26,7 +26,7 @@ public partial class DblibraryContext : DbContext
 
     public virtual DbSet<Position> Positions { get; set; }
 
-    public virtual DbSet<Publisher> Publishers { get; set; }
+  //  public virtual DbSet<Publisher> Publishers { get; set; }
 
     public virtual DbSet<ResearchWork> ResearchWorks { get; set; }
 
@@ -108,7 +108,7 @@ public partial class DblibraryContext : DbContext
                 .HasConstraintName("FK_Position_Employee");
         });
 
-        modelBuilder.Entity<Publisher>(entity =>
+       /* modelBuilder.Entity<Publisher>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Publishe__3214EC073D31CE57");
 
@@ -120,7 +120,7 @@ public partial class DblibraryContext : DbContext
             entity.Property(e => e.FullName)
                 .HasMaxLength(200)
                 .IsUnicode(false);
-        });
+        });*/
 
         modelBuilder.Entity<ResearchWork>(entity =>
         {

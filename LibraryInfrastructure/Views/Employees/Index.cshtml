@@ -7,7 +7,7 @@
 <h1>Працівники</h1>
 
 <p>
-    <a asp-action="Create">Створити новий</a>
+    <a asp-action="Create">Створити нового</a>
 </p>
 <table class="table">
     <thead>
@@ -62,12 +62,8 @@
                        asp-action="Details"
                        asp-route-id="@item.LabId">
                         Перейти до лабораторії
-                    </a> |
-                    <a asp-controller="Departments"
-                       asp-action="Details"
-                       asp-route-id="@item.DepartmentId">
-                        Перейти до катерди
-                    </a>
+                    </a> 
+                   
             </td>
         </tr>
 }

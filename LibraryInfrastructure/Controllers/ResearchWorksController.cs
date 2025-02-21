@@ -59,7 +59,7 @@ namespace LibraryInfrastructure.Controllers
         {
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName");
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName");
-            ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName");
+           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName");
             return View();
         }
 
@@ -68,7 +68,7 @@ namespace LibraryInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Title,EmployeeId,PublisherId,AreaId,Id")] ResearchWork researchWork)
+        public async Task<IActionResult> Create([Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
         {
             if (ModelState.IsValid)
             {
@@ -78,7 +78,7 @@ namespace LibraryInfrastructure.Controllers
             }
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName", researchWork.AreaId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", researchWork.EmployeeId);
-            ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
+           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
             return View(researchWork);
         }
 
@@ -97,7 +97,7 @@ namespace LibraryInfrastructure.Controllers
             }
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName", researchWork.AreaId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", researchWork.EmployeeId);
-            ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
+           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
             return View(researchWork);
         }
 
@@ -106,7 +106,7 @@ namespace LibraryInfrastructure.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Title,EmployeeId,PublisherId,AreaId,Id")] ResearchWork researchWork)
+        public async Task<IActionResult> Edit(int id, [Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
         {
             if (id != researchWork.Id)
             {
@@ -135,7 +135,7 @@ namespace LibraryInfrastructure.Controllers
             }
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName", researchWork.AreaId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", researchWork.EmployeeId);
-            ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
+           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
             return View(researchWork);
         }
 

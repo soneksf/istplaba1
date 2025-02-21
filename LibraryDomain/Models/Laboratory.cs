@@ -7,6 +7,7 @@ namespace LibraryDomain.Models;
 public partial class Laboratory : Entity
 {
     // public int Id { get; set; }
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Номер лабораторії")]
     public string LabNumber { get; set; } = null!;
 

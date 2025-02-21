@@ -6,6 +6,7 @@ namespace LibraryDomain.Models;
 
 public partial class Department : Entity
 {
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display (Name = "Назва катедри")]
 //    public int Id { get; set; }
 
