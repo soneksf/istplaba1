@@ -9,63 +9,85 @@
 <p>
     <a asp-action="Create">Створити нового</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.FullName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Faculty)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Department)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Lab)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.FullName)</th>
+            <th>@Html.DisplayNameFor(model => model.Faculty)</th>
+            <th>@Html.DisplayNameFor(model => model.StartDate)</th>
+            <th>@Html.DisplayNameFor(model => model.EndDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Department.DepartmentName)</th>
+            <th>@Html.DisplayNameFor(model => model.Lab.LabNumber)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Faculty)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Department.DepartmentName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lab.LabNumber)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a> |
-                 <a asp-controller="Laboratories"
-                       asp-action="Details"
-                       asp-route-id="@item.LabId">
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(m => item.FullName)</td>
+                <td>@Html.DisplayFor(m => item.Faculty)</td>
+                <td>@Html.DisplayFor(m => item.StartDate)</td>
+                <td>@Html.DisplayFor(m => item.EndDate)</td>
+                <td>@Html.DisplayFor(m => item.Department.DepartmentName)</td>
+                <td>@Html.DisplayFor(m => item.Lab.LabNumber)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a> |
+                    <a asp-controller="Laboratories" asp-action="Details" asp-route-id="@item.LabId">
                         Перейти до лабораторії
-                    </a> 
-                   
-            </td>
-        </tr>
-}
+                    </a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<!-- Container for the chart -->
+<div class="row">
+    <div class="col-12">
+        <h2>Працівники за роками</h2>
+        <div id="employeesByYearChart" style="width: 700px; height: 400px;"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Load the Google Charts library -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        // Load the 'corechart' package from Google
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(drawEmployeesByYear);
+
+        function drawEmployeesByYear() {
+            // Fetch JSON data from your chart endpoint
+            fetch('/api/Chart/employees-by-year')
+                .then(response => response.json())
+                .then(data => {
+                    // Build the data table for Google Charts
+                    const dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Рік');
+                    dataTable.addColumn('number', 'Кількість працівників');
+
+                    // data is assumed to be an array of objects like { "year": "2000", "count": 3 }
+                    data.forEach(item => {
+                        dataTable.addRow([item.year, item.count]);
+                    });
+
+                    // Chart options
+                    const options = {
+                        title: 'Працівники за роками',
+                        legend: { position: 'none' },
+                        width: 700,
+                        height: 400
+                    };
+
+                    // Draw the column chart
+                    const chart = new google.visualization.ColumnChart(document.getElementById('employeesByYearChart'));
+                    chart.draw(dataTable, options);
+                });
+        }
+    </script>
+}

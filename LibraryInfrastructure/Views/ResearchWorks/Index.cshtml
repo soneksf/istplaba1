@@ -9,50 +9,78 @@
 <p>
     <a asp-action="Create">Створити нову</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Area)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employee)
-            </th>
-          <!--  <th>
-                Html.DisplayNameFor(model => model.Publisher)
-            </th>-->
+            <th>@Html.DisplayNameFor(m => m.Title)</th>
+            <th>@Html.DisplayNameFor(m => m.Area.AreaName)</th>
+            <th>@Html.DisplayNameFor(m => m.Employee.FullName)</th>
+            <!-- If you had a Publisher, you could display it here -->
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Area.AreaName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Employee.FullName)
-            </td>
-          <!--  <td>
-                Html.DisplayFor(modelItem => item.Publisher.FullName)
-            </td> -->
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a> |
-                    <a asp-controller="Areas"
-                       asp-action="Index"
-                       asp-route-id="@item.AreaId">
-                        Область
-                    </a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(_ => item.Title)</td>
+                <td>@Html.DisplayFor(_ => item.Area.AreaName)</td>
+                <td>@Html.DisplayFor(_ => item.Employee.FullName)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a> |
+                    <a asp-controller="Areas" asp-action="Index" asp-route-id="@item.AreaId">Область</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<!-- Add a section for your new chart -->
+<div class="row">
+    <div class="col-12">
+        <h2>Дослідницькі роботи по працівнику</h2>
+        <div id="researchWorksByEmployeeChart" style="width: 700px; height: 400px;"></div>
+    </div>
+</div>
+
+@section Scripts {
+    <!-- Load the Google Charts library -->
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        // Load the 'corechart' package
+        google.charts.load('current', { packages: ['corechart'] });
+        google.charts.setOnLoadCallback(drawResearchWorksByEmployee);
+
+        function drawResearchWorksByEmployee() {
+            // Fetch data from your new Chart endpoint
+            fetch('/api/Chart/research-works-per-employee')
+                .then(response => response.json())
+                .then(data => {
+                    // Build the data table
+                    const dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Працівник');
+                    dataTable.addColumn('number', 'Кількість робіт');
+
+                    // data: [{ employeeName: "...", count: 5 }, ...]
+                    data.forEach(item => {
+                        dataTable.addRow([item.employeeName, item.count]);
+                    });
+
+                    // Chart options
+                    const options = {
+                        title: 'Дослідницькі роботи по працівнику',
+                        legend: { position: 'none' },
+                        width: 700,
+                        height: 400
+                    };
+
+                    // Draw a ColumnChart
+                    const chart = new google.visualization.ColumnChart(document.getElementById('researchWorksByEmployeeChart'));
+                    chart.draw(dataTable, options);
+                });
+        }
+    </script>
+}
