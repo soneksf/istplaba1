@@ -1,13 +1,13 @@
 ﻿@model LibraryDomain.Models.ResearchWork
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Деталі";
 }
 
-<h1>Details</h1>
+<h1>Деталі</h1>
 
 <div>
-    <h4>ResearchWork</h4>
+    <h4>Наукова робота</h4>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
@@ -28,12 +28,7 @@
         <dd class = "col-sm-10">
             @Html.DisplayFor(model => model.Employee.FullName)
         </dd>
-      <!--  <dt class = "col-sm-2">
-            Html.DisplayNameFor(model => model.Publisher)
-        </dt>
-        <dd class = "col-sm-10">
-            Html.DisplayFor(model => model.Publisher.FullName)
-        </dd> -->
+    
     </dl>
 </div>
 <div>

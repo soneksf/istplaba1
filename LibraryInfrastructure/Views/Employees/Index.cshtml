@@ -45,47 +45,78 @@
     </tbody>
 </table>
 
-<!-- Container for the chart -->
+
 <div class="row">
-    <div class="col-12">
+   
+    <div class="col-6">
         <h2>Працівники за роками</h2>
-        <div id="employeesByYearChart" style="width: 700px; height: 400px;"></div>
+        <div id="employeesByYearChart" style="width: 100%; height: 400px;"></div>
+    </div>
+
+   
+    <div class="col-6">
+        <h2>Працівники за катедрами</h2>
+        <div id="employeesByDeptPie" style="width: 100%; height: 400px;"></div>
     </div>
 </div>
 
 @section Scripts {
-    <!-- Load the Google Charts library -->
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
-        // Load the 'corechart' package from Google
         google.charts.load('current', { packages: ['corechart'] });
-        google.charts.setOnLoadCallback(drawEmployeesByYear);
+        google.charts.setOnLoadCallback(drawAllCharts);
+
+        function drawAllCharts() {
+            drawEmployeesByYear();
+            drawEmployeesByDeptPie();
+        }
 
         function drawEmployeesByYear() {
-            // Fetch JSON data from your chart endpoint
             fetch('/api/Chart/employees-by-year')
                 .then(response => response.json())
                 .then(data => {
-                    // Build the data table for Google Charts
                     const dataTable = new google.visualization.DataTable();
                     dataTable.addColumn('string', 'Рік');
                     dataTable.addColumn('number', 'Кількість працівників');
 
-                    // data is assumed to be an array of objects like { "year": "2000", "count": 3 }
                     data.forEach(item => {
                         dataTable.addRow([item.year, item.count]);
                     });
 
-                    // Chart options
                     const options = {
                         title: 'Працівники за роками',
                         legend: { position: 'none' },
-                        width: 700,
+                        width: '100%',
                         height: 400
                     };
 
-                    // Draw the column chart
                     const chart = new google.visualization.ColumnChart(document.getElementById('employeesByYearChart'));
+                    chart.draw(dataTable, options);
+                });
+        }
+
+        function drawEmployeesByDeptPie() {
+            fetch('/api/Chart/employees-by-department')
+                .then(response => response.json())
+                .then(data => {
+                    const dataTable = new google.visualization.DataTable();
+                    dataTable.addColumn('string', 'Катедра');
+                    dataTable.addColumn('number', 'Кількість');
+
+                    data.forEach(item => {
+                        dataTable.addRow([item.label, item.value]);
+                    });
+
+                    const options = {
+                        title: 'Співвідношення працівників за катедрами',
+                        is3D: false,
+                        pieHole: 0.0,
+                        legend: { position: 'right' },
+                        width: '100%',
+                        height: 400
+                    };
+
+                    const chart = new google.visualization.PieChart(document.getElementById('employeesByDeptPie'));
                     chart.draw(dataTable, options);
                 });
         }

@@ -7,7 +7,7 @@
 <h2>Employee: @Model.FullName</h2>
 <p>Department: @(Model.Department?.DepartmentName ?? "None")</p>
 <p>Lab: @(Model.Lab?.LabNumber ?? "None")</p>
-<!-- etc. -->
+
 
 <hr />
 
@@ -39,7 +39,7 @@ else
     <p>No positions found.</p>
 }
 
-<!-- Link to create a new Position for this employee -->
+
 <p>
     <a asp-controller="Positions"
        asp-action="Create"
@@ -51,5 +51,5 @@ else
 
 <hr />
 
-<!-- Back to list, edit, etc. -->
+
 <a asp-action="Index">Повернутись до списку</a>
