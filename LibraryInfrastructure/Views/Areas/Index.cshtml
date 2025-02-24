@@ -1,10 +1,18 @@
 ﻿@model IEnumerable<LibraryDomain.Models.Area>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Області";
 }
 
-<h1>Index</h1>
+<h1>Області</h1>
+
+<!-- If there's a delete error, show it -->
+@if (TempData["DeleteError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["DeleteError"]
+    </div>
+}
 
 <p>
     <a asp-action="Create">Створити нову</a>
@@ -12,24 +20,21 @@
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.AreaName)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.AreaName)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AreaName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.AreaName)</td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

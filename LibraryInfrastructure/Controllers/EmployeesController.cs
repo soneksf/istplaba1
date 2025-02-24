@@ -187,14 +187,26 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employee = await _context.Employees.FindAsync(id);
-            if (employee != null)
+            if (employee == null)
             {
-                _context.Employees.Remove(employee);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Employees.Remove(employee);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // This typically indicates the delete is blocked by a foreign key constraint
+                TempData["DeleteError"] = "Неможливо видалити працівника, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool EmployeeExists(int id)
         {

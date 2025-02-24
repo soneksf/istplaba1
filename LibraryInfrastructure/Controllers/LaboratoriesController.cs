@@ -134,20 +134,31 @@ namespace LibraryInfrastructure.Controllers
             return View(laboratory);
         }
 
-        // POST: Laboratories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var laboratory = await _context.Laboratories.FindAsync(id);
-            if (laboratory != null)
+            if (laboratory == null)
             {
-                _context.Laboratories.Remove(laboratory);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Laboratories.Remove(laboratory);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // Means there's likely a foreign key constraint blocking the delete
+                TempData["DeleteError"] = "Неможливо видалити лабораторію, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool LaboratoryExists(int id)
         {

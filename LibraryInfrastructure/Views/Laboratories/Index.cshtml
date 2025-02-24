@@ -5,7 +5,12 @@
 }
 
 <h1>Лабораторії</h1>
-
+@if (TempData["DeleteError"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["DeleteError"]
+    </div>
+}
 <p>
     <a asp-action="Create">Створити новий</a>
 </p>

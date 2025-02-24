@@ -166,14 +166,26 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var researchWork = await _context.ResearchWorks.FindAsync(id);
-            if (researchWork != null)
+            if (researchWork == null)
             {
-                _context.ResearchWorks.Remove(researchWork);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.ResearchWorks.Remove(researchWork);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // Typically means a foreign key constraint or other DB error
+                TempData["DeleteError"] = "Неможливо видалити наукову роботу, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool ResearchWorkExists(int id)
         {

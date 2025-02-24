@@ -161,14 +161,26 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var position = await _context.Positions.FindAsync(id);
-            if (position != null)
+            if (position == null)
             {
-                _context.Positions.Remove(position);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Positions.Remove(position);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // Likely a foreign key constraint violation (or other DB error)
+                TempData["DeleteError"] = "Неможливо видалити посаду, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool PositionExists(int id)
         {

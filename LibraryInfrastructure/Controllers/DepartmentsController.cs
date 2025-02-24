@@ -141,14 +141,26 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var department = await _context.Departments.FindAsync(id);
-            if (department != null)
+            if (department == null)
             {
-                _context.Departments.Remove(department);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Departments.Remove(department);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException )
+            {
+                
+                TempData["DeleteError"] = "Неможливо видалити катедру, оскільки є пов’язані працівники.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool DepartmentExists(int id)
         {

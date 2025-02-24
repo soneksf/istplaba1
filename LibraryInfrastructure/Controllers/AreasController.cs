@@ -140,14 +140,26 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var area = await _context.Areas.FindAsync(id);
-            if (area != null)
+            if (area == null)
             {
-                _context.Areas.Remove(area);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                _context.Areas.Remove(area);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                // This typically means a foreign key constraint prevents the delete
+                TempData["DeleteError"] = "Неможливо видалити область, оскільки є пов’язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
+
             return RedirectToAction(nameof(Index));
         }
+
 
         private bool AreaExists(int id)
         {
