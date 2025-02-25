@@ -46,17 +46,14 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Positions/Create
-        // GET: Positions/Create
         public IActionResult Create(int? employeeId)
         {
             if (employeeId.HasValue)
             {
-                // Preselect the passed employee
                 ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", employeeId.Value);
             }
             else
             {
-                // Show all employees if none specified
                 ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName");
             }
 
@@ -78,7 +75,6 @@ namespace LibraryInfrastructure.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", position.EmployeeId);
-            // return View(position);
             return RedirectToAction("Details", "Employees", new { id = position.EmployeeId });
 
         }
@@ -165,8 +161,19 @@ namespace LibraryInfrastructure.Controllers
             {
                 _context.Positions.Remove(position);
             }
+            try
+            {
+                _context.Positions.Remove(position);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+           await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

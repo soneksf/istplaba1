@@ -6,7 +6,7 @@ namespace LibraryDomain.Models;
 
 public partial class Area : Entity
 {
-    //  public int Id { get; set; }
+    
     [Required (ErrorMessage ="Поле не повинно бути порожнім")]
     [Display(Name = "Область наукової роботи")]
     public string AreaName { get; set; } = null!;

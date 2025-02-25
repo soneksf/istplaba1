@@ -144,8 +144,19 @@ namespace LibraryInfrastructure.Controllers
             {
                 _context.Laboratories.Remove(laboratory);
             }
+            try
+            {
+                _context.Laboratories.Remove(laboratory);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+           await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

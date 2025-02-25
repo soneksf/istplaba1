@@ -5,7 +5,7 @@ namespace LibraryDomain.Models;
 
 public partial class Employee : Entity
 {
-    // public int Id { get; set; }
+   
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "ПІБ")]
     public string FullName { get; set; } = null!;

@@ -145,9 +145,20 @@ namespace LibraryInfrastructure.Controllers
             {
                 _context.Departments.Remove(department);
             }
+            try
+            {
+                _context.Departments.Remove(department);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            /*await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));*/
         }
 
         private bool DepartmentExists(int id)

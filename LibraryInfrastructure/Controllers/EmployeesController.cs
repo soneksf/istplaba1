@@ -20,25 +20,20 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees
-        // GET: Employees
         public async Task<IActionResult> Index(int? departmentId, string? departmentName)
         {
-            // Start with a base query
             var employeesQuery = _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Lab)
                 .AsQueryable();
 
-            // If departmentId is given, filter
             if (departmentId != null)
             {
                 employeesQuery = employeesQuery.Where(e => e.DepartmentId == departmentId);
-                // Store these in ViewBag if you want to show them in the view
                 ViewBag.DepartmentId = departmentId;
                 ViewBag.DepartmentName = departmentName;
             }
 
-            // Execute the query
             var employees = await employeesQuery.ToListAsync();
             return View(employees);
         }
@@ -55,7 +50,7 @@ namespace LibraryInfrastructure.Controllers
             var employee = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Lab)
-                .Include(e => e.Positions)  // <-- Include Positions here
+                .Include(e => e.Positions)  
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (employee == null)
             {
@@ -69,7 +64,6 @@ namespace LibraryInfrastructure.Controllers
         // GET: Employees/Create
         public IActionResult Create(int? departmentId)
         {
-            // Department dropdown (if you need it)
             if (departmentId.HasValue)
             {
                 ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "DepartmentName", departmentId.Value);
@@ -191,8 +185,19 @@ namespace LibraryInfrastructure.Controllers
             {
                 _context.Employees.Remove(employee);
             }
+            try
+            {
+                _context.Employees.Remove(employee);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
 
-            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+           await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

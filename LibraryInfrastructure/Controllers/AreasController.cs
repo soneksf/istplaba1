@@ -144,7 +144,19 @@ namespace LibraryInfrastructure.Controllers
             {
                 _context.Areas.Remove(area);
             }
+            try
+            {
+                _context.Areas.Remove(area);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                
+                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
 
+            return RedirectToAction(nameof(Index));
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

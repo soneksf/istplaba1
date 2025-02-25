@@ -6,7 +6,7 @@ namespace LibraryDomain.Models;
 
 public partial class Position : Entity
 {
-    // public int Id { get; set; }
+    
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Поcада працівника")]
     public string PositionName { get; set; } = null!;

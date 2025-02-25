@@ -22,7 +22,7 @@ namespace LibraryInfrastructure.Controllers
         // GET: ResearchWorks
         public async Task<IActionResult> Index()
         {
-            var dblibraryContext = _context.ResearchWorks.Include(r => r.Area).Include(r => r.Employee)/*.Include(r => r.Publisher)*/;
+            var dblibraryContext = _context.ResearchWorks.Include(r => r.Area).Include(r => r.Employee);
             return View(await dblibraryContext.ToListAsync());
         }
 
@@ -34,9 +34,8 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            // Load the researchWork and its Employee (to access DepartmentId).
             var researchWork = await _context.ResearchWorks
-                .Include(r => r.Employee)      // So we can access Employee.DepartmentId
+                .Include(r => r.Employee)      
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (researchWork == null)
@@ -44,11 +43,8 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            // Retrieve the departmentId from the researchWork's Employee.
-            // If Employee is null or DepartmentId is unknown, handle that scenario.
             int departmentId = researchWork.Employee.DepartmentId;
 
-            // Now redirect to the DepartmentsController Details action with that ID.
             return RedirectToAction("Details", "Departments", new { id = departmentId });
         }
 
@@ -59,7 +55,6 @@ namespace LibraryInfrastructure.Controllers
         {
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName");
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName");
-           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName");
             return View();
         }
 
@@ -78,7 +73,6 @@ namespace LibraryInfrastructure.Controllers
             }
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName", researchWork.AreaId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", researchWork.EmployeeId);
-           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
             return View(researchWork);
         }
 
@@ -97,7 +91,6 @@ namespace LibraryInfrastructure.Controllers
             }
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName", researchWork.AreaId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", researchWork.EmployeeId);
-           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
             return View(researchWork);
         }
 
@@ -135,7 +128,6 @@ namespace LibraryInfrastructure.Controllers
             }
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName", researchWork.AreaId);
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", researchWork.EmployeeId);
-           // ViewData["PublisherId"] = new SelectList(_context.Publishers, "Id", "FullName"/*, researchWork.PublisherId*/);
             return View(researchWork);
         }
 
@@ -150,7 +142,6 @@ namespace LibraryInfrastructure.Controllers
             var researchWork = await _context.ResearchWorks
                 .Include(r => r.Area)
                 .Include(r => r.Employee)
-             //   .Include(r => r.Publisher)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (researchWork == null)
             {
@@ -170,7 +161,18 @@ namespace LibraryInfrastructure.Controllers
             {
                 _context.ResearchWorks.Remove(researchWork);
             }
+            try
+            {
+                _context.ResearchWorks.Remove(researchWork);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException)
+            {
+                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                return RedirectToAction(nameof(Index));
+            }
 
+            return RedirectToAction(nameof(Index));
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

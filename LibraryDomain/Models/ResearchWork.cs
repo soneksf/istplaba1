@@ -13,14 +13,13 @@ public partial class ResearchWork : Entity
 
     [Display(Name = "Працівник")]
     public int EmployeeId { get; set; }
-    //[Display(Name = "Автор")]
-  //  public int PublisherId { get; set; }
+ 
     [Display(Name = "Область наукової роботи")]
     public int AreaId { get; set; }
     [Display(Name = "Область наукової роботи")]
-    public virtual Area? Area { get; set; } = null!;
+    public virtual Area? Area { get; set; } 
     [Display(Name = "Працівник")]
-    public virtual Employee? Employee { get; set; } = null!;
+    public virtual Employee? Employee { get; set; } 
 
    // public virtual Publisher? Publisher { get; set; } = null!;
 }
