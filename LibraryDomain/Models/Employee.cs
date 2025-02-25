@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 namespace LibraryDomain.Models;
-
+using LibraryDomain.Validation;
 public partial class Employee : Entity
 {
    
@@ -14,8 +14,10 @@ public partial class Employee : Entity
     [Display(Name = "Факультет")]
     public string? Faculty { get; set; }
 
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
+    [PastOrYesterdayDate(ErrorMessage = "Дата початку роботи не може бути сьогодні або в майбутньому")]
     [Display(Name = "Дата початку роботи")]
-    public DateOnly? StartDate { get; set; }
+    public DateOnly StartDate { get; set; }
 
     [Display(Name = "Дата закінчення")]
     public DateOnly? EndDate { get; set; }

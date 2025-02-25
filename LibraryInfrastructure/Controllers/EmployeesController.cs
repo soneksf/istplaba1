@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
@@ -20,81 +16,53 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees
-        public async Task<IActionResult> Index(int? departmentId, string? departmentName)
+        public async Task<IActionResult> Index()
         {
-            var employeesQuery = _context.Employees
+            // Include Department & Lab for display
+            var employees = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Lab)
-                .AsQueryable();
-
-            if (departmentId != null)
-            {
-                employeesQuery = employeesQuery.Where(e => e.DepartmentId == departmentId);
-                ViewBag.DepartmentId = departmentId;
-                ViewBag.DepartmentName = departmentName;
-            }
-
-            var employees = await employeesQuery.ToListAsync();
+                .ToListAsync();
             return View(employees);
         }
-
 
         // GET: Employees/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var employee = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Lab)
-                .Include(e => e.Positions)  
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
+            if (employee == null) return NotFound();
 
             return View(employee);
         }
 
-
         // GET: Employees/Create
-        public IActionResult Create(int? departmentId)
+        public IActionResult Create()
         {
-            if (departmentId.HasValue)
-            {
-                ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "DepartmentName", departmentId.Value);
-            }
-            else
-            {
-                ViewBag.DepartmentId = new SelectList(_context.Departments, "Id", "DepartmentName");
-            }
-
-            // Laboratory dropdown
-            ViewBag.LabId = new SelectList(_context.Laboratories, "Id", "LabNumber");
-
+            // Populate dropdowns
+            ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName");
+            ViewData["LabId"] = new SelectList(_context.Laboratories, "Id", "LabNumber");
             return View();
         }
 
-
-
-
         // POST: Employees/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
+            // Check ModelState — ensures [Required] fields (including StartDate) are provided
             if (ModelState.IsValid)
             {
                 _context.Add(employee);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            // If model is invalid, re-populate dropdowns and return the same view
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName", employee.DepartmentId);
             ViewData["LabId"] = new SelectList(_context.Laboratories, "Id", "LabNumber", employee.LabId);
             return View(employee);
@@ -103,32 +71,22 @@ namespace LibraryInfrastructure.Controllers
         // GET: Employees/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var employee = await _context.Employees.FindAsync(id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
+            if (employee == null) return NotFound();
+
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName", employee.DepartmentId);
             ViewData["LabId"] = new SelectList(_context.Laboratories, "Id", "LabNumber", employee.LabId);
             return View(employee);
         }
 
         // POST: Employees/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
-            if (id != employee.Id)
-            {
-                return NotFound();
-            }
+            if (id != employee.Id) return NotFound();
 
             if (ModelState.IsValid)
             {
@@ -139,17 +97,12 @@ namespace LibraryInfrastructure.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!EmployeeExists(employee.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!EmployeeExists(employee.Id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
+
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName", employee.DepartmentId);
             ViewData["LabId"] = new SelectList(_context.Laboratories, "Id", "LabNumber", employee.LabId);
             return View(employee);
@@ -158,19 +111,13 @@ namespace LibraryInfrastructure.Controllers
         // GET: Employees/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var employee = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Lab)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (employee == null)
-            {
-                return NotFound();
-            }
+            if (employee == null) return NotFound();
 
             return View(employee);
         }
@@ -181,10 +128,8 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employee = await _context.Employees.FindAsync(id);
-            if (employee != null)
-            {
-                _context.Employees.Remove(employee);
-            }
+            if (employee == null) return NotFound();
+
             try
             {
                 _context.Employees.Remove(employee);
@@ -192,12 +137,10 @@ namespace LibraryInfrastructure.Controllers
             }
             catch (DbUpdateException)
             {
-                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                TempData["DeleteError"] = "Не вдається видалити працівника, бо є пов’язані записи.";
                 return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Index));
-           await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

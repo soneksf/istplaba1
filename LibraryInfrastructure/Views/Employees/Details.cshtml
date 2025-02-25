@@ -6,7 +6,11 @@
 
 <h2>Employee: @Model.FullName</h2>
 <p>Department: @(Model.Department?.DepartmentName ?? "None")</p>
-<p>Lab: @(Model.Lab?.LabNumber ?? "None")</p>
+<p>
+    Lab: @(Model.Lab == null
+    ? "None"
+    : Model.Lab.LabNumber.ToString())
+</p>
 
 
 <hr />
