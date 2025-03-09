@@ -18,7 +18,6 @@ namespace LibraryInfrastructure.Controllers
         // GET: Employees
         public async Task<IActionResult> Index()
         {
-            // Include Department & Lab for display
             var employees = await _context.Employees
                 .Include(e => e.Department)
                 .Include(e => e.Lab)
@@ -43,7 +42,6 @@ namespace LibraryInfrastructure.Controllers
         // GET: Employees/Create
         public IActionResult Create()
         {
-            // Populate dropdowns
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName");
             ViewData["LabId"] = new SelectList(_context.Laboratories, "Id", "LabNumber");
             return View();
@@ -54,7 +52,7 @@ namespace LibraryInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
-            // Check ModelState — ensures [Required] fields (including StartDate) are provided
+            
             if (ModelState.IsValid)
             {
                 _context.Add(employee);
@@ -62,7 +60,7 @@ namespace LibraryInfrastructure.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            // If model is invalid, re-populate dropdowns and return the same view
+            
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName", employee.DepartmentId);
             ViewData["LabId"] = new SelectList(_context.Laboratories, "Id", "LabNumber", employee.LabId);
             return View(employee);
