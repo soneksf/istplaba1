@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
 using LibraryInfrastructure;
@@ -50,12 +49,16 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: Laboratories/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LabNumber,Id")] Laboratory laboratory)
         {
+            // Check if a laboratory with the same LabNumber already exists
+            if (_context.Laboratories.Any(l => l.LabNumber == laboratory.LabNumber))
+            {
+                ModelState.AddModelError("LabNumber", "Лабораторія з таким номером вже існує.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(laboratory);
@@ -82,8 +85,6 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: Laboratories/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("LabNumber,Id")] Laboratory laboratory)
@@ -91,6 +92,12 @@ namespace LibraryInfrastructure.Controllers
             if (id != laboratory.Id)
             {
                 return NotFound();
+            }
+
+            // Check for duplicates, excluding the current laboratory record
+            if (_context.Laboratories.Any(l => l.LabNumber == laboratory.LabNumber && l.Id != laboratory.Id))
+            {
+                ModelState.AddModelError("LabNumber", "Лабораторія з таким номером вже існує.");
             }
 
             if (ModelState.IsValid)
@@ -140,9 +147,9 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var laboratory = await _context.Laboratories.FindAsync(id);
-            if (laboratory != null)
+            if (laboratory == null)
             {
-                _context.Laboratories.Remove(laboratory);
+                return NotFound();
             }
             try
             {
@@ -151,12 +158,10 @@ namespace LibraryInfrastructure.Controllers
             }
             catch (DbUpdateException)
             {
-                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                TempData["DeleteError"] = "Неможливо видалити лабораторію, оскільки існують пов'язані записи.";
                 return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Index));
-           await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

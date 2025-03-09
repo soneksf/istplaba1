@@ -52,7 +52,12 @@ namespace LibraryInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
-            
+            // Check for duplicate FullName
+            if (_context.Employees.Any(e => e.FullName == employee.FullName))
+            {
+                ModelState.AddModelError("FullName", "Працівник з таким ім'ям вже існує.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(employee);
@@ -60,7 +65,6 @@ namespace LibraryInfrastructure.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName", employee.DepartmentId);
             ViewData["LabId"] = new SelectList(_context.Laboratories, "Id", "LabNumber", employee.LabId);
             return View(employee);
@@ -85,6 +89,12 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
             if (id != employee.Id) return NotFound();
+
+            // Check for duplicate FullName excluding the current record
+            if (_context.Employees.Any(e => e.FullName == employee.FullName && e.Id != employee.Id))
+            {
+                ModelState.AddModelError("FullName", "Працівник з таким ім'ям вже існує.");
+            }
 
             if (ModelState.IsValid)
             {

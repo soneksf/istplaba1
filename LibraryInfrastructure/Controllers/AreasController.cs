@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
 using LibraryInfrastructure;
@@ -50,12 +49,16 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: Areas/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AreaName,Id")] Area area)
         {
+            // Check if an area with the same name already exists.
+            if (_context.Areas.Any(a => a.AreaName == area.AreaName))
+            {
+                ModelState.AddModelError("AreaName", "Дослідна область з такою назвою вже існує.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(area);
@@ -82,8 +85,6 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: Areas/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("AreaName,Id")] Area area)
@@ -91,6 +92,12 @@ namespace LibraryInfrastructure.Controllers
             if (id != area.Id)
             {
                 return NotFound();
+            }
+
+            // Check for duplicate AreaName excluding the current record.
+            if (_context.Areas.Any(a => a.AreaName == area.AreaName && a.Id != area.Id))
+            {
+                ModelState.AddModelError("AreaName", "Дослідна область з такою назвою вже існує.");
             }
 
             if (ModelState.IsValid)
@@ -140,9 +147,9 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var area = await _context.Areas.FindAsync(id);
-            if (area != null)
+            if (area == null)
             {
-                _context.Areas.Remove(area);
+                return NotFound();
             }
             try
             {
@@ -151,13 +158,10 @@ namespace LibraryInfrastructure.Controllers
             }
             catch (DbUpdateException)
             {
-                
-                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                TempData["DeleteError"] = "Неможливо видалити область, оскільки існують пов'язані записи.";
                 return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Index));
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

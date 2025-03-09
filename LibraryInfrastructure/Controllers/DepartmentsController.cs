@@ -57,6 +57,12 @@ namespace LibraryInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("DepartmentName,Id")] Department department)
         {
+            // Check if a department with the same name already exists
+            if (_context.Departments.Any(d => d.DepartmentName == department.DepartmentName))
+            {
+                ModelState.AddModelError("DepartmentName", "Відділ з такою назвою вже існує.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(department);
@@ -65,6 +71,7 @@ namespace LibraryInfrastructure.Controllers
             }
             return View(department);
         }
+
 
         // GET: Departments/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -94,6 +101,12 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
+            // Check for duplicates, excluding the current department record
+            if (_context.Departments.Any(d => d.DepartmentName == department.DepartmentName && d.Id != department.Id))
+            {
+                ModelState.AddModelError("DepartmentName", "Відділ з такою назвою вже існує.");
+            }
+
             if (ModelState.IsValid)
             {
                 try
@@ -116,6 +129,7 @@ namespace LibraryInfrastructure.Controllers
             }
             return View(department);
         }
+
 
         // GET: Departments/Delete/5
         public async Task<IActionResult> Delete(int? id)

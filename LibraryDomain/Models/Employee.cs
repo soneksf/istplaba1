@@ -20,6 +20,7 @@ public partial class Employee : Entity
     public DateOnly StartDate { get; set; }
 
     [Display(Name = "Дата закінчення")]
+    [DateGreaterThan("StartDate", ErrorMessage = "Дата закінчення не може бути меншою за дату початку")]
     public DateOnly? EndDate { get; set; }
 
     [Display(Name = "Катедра")]

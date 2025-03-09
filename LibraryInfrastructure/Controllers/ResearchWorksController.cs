@@ -35,7 +35,7 @@ namespace LibraryInfrastructure.Controllers
             }
 
             var researchWork = await _context.ResearchWorks
-                .Include(r => r.Employee)      
+                .Include(r => r.Employee)
                 .FirstOrDefaultAsync(r => r.Id == id);
 
             if (researchWork == null)
@@ -48,8 +48,6 @@ namespace LibraryInfrastructure.Controllers
             return RedirectToAction("Details", "Departments", new { id = departmentId });
         }
 
-
-
         // GET: ResearchWorks/Create
         public IActionResult Create()
         {
@@ -59,12 +57,16 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: ResearchWorks/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
         {
+            // Check if a research work with the same Title already exists
+            if (_context.ResearchWorks.Any(r => r.Title == researchWork.Title))
+            {
+                ModelState.AddModelError("Title", "Дослідницька робота з таким заголовком вже існує.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(researchWork);
@@ -95,8 +97,6 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: ResearchWorks/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
@@ -104,6 +104,12 @@ namespace LibraryInfrastructure.Controllers
             if (id != researchWork.Id)
             {
                 return NotFound();
+            }
+
+            // Check for duplicate Title excluding the current record
+            if (_context.ResearchWorks.Any(r => r.Title == researchWork.Title && r.Id != researchWork.Id))
+            {
+                ModelState.AddModelError("Title", "Дослідницька робота з таким заголовком вже існує.");
             }
 
             if (ModelState.IsValid)
@@ -157,9 +163,9 @@ namespace LibraryInfrastructure.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var researchWork = await _context.ResearchWorks.FindAsync(id);
-            if (researchWork != null)
+            if (researchWork == null)
             {
-                _context.ResearchWorks.Remove(researchWork);
+                return NotFound();
             }
             try
             {
@@ -172,8 +178,6 @@ namespace LibraryInfrastructure.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
-            return RedirectToAction(nameof(Index));
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
