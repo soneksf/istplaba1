@@ -6,7 +6,6 @@ namespace LibraryDomain.Models;
 
 public partial class ResearchWork : Entity
 {
-    // public int Id { get; set; }
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Назва наукової роботи")]
     public string Title { get; set; } = null!;
@@ -21,5 +20,4 @@ public partial class ResearchWork : Entity
     [Display(Name = "Працівник")]
     public virtual Employee? Employee { get; set; } 
 
-   // public virtual Publisher? Publisher { get; set; } = null!;
 }

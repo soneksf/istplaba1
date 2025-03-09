@@ -90,7 +90,7 @@ namespace LibraryInfrastructure.Controllers
         {
             if (id != employee.Id) return NotFound();
 
-            // Check for duplicate FullName excluding the current record
+            
             if (_context.Employees.Any(e => e.FullName == employee.FullName && e.Id != employee.Id))
             {
                 ModelState.AddModelError("FullName", "Працівник з таким ім'ям вже існує.");

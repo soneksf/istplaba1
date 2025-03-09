@@ -24,6 +24,7 @@ namespace LibraryInfrastructure.Controllers
         {
             var dblibraryContext = _context.Positions.Include(p => p.Employee);
             return View(await dblibraryContext.ToListAsync());
+           // return View(dblibraryContext);
         }
 
         // GET: Positions/Details/5
@@ -68,16 +69,26 @@ namespace LibraryInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,PositionName,StartDate,EndDate,EmployeeId")] Position position)
         {
+            // Check if the same position already exists for this employee
+            bool positionExists = _context.Positions
+                .Any(p => p.EmployeeId == position.EmployeeId && p.PositionName == position.PositionName);
+
+            if (positionExists)
+            {
+                ModelState.AddModelError("PositionName", "Цей працівник вже має таку посаду.");
+            }
+
             if (ModelState.IsValid)
             {
                 _context.Add(position);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", position.EmployeeId);
-            return RedirectToAction("Details", "Employees", new { id = position.EmployeeId });
 
+            ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", position.EmployeeId);
+            return View(position);
         }
+
 
         // GET: Positions/Edit/5
         public async Task<IActionResult> Edit(int? id)
@@ -173,8 +184,7 @@ namespace LibraryInfrastructure.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-           await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+           
         }
 
         private bool PositionExists(int id)

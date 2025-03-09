@@ -24,7 +24,7 @@ namespace LibraryInfrastructure.Controllers
         public async Task<ActionResult<IEnumerable<CountByYearResponseItem>>> GetEmployeesByYear()
         {
             var data = await _context.Employees
-                // If StartDate is non-nullable, no need for HasValue:
+                
                 .GroupBy(e => e.StartDate.Year)
                 .Select(g => new CountByYearResponseItem(
                     g.Key.ToString(),
@@ -44,7 +44,7 @@ namespace LibraryInfrastructure.Controllers
                 .GroupBy(r => r.EmployeeId)
                 .Select(g => new
                 {
-                    EmployeeName = g.Select(x => x.Employee.FullName).FirstOrDefault() ?? "No Name",
+                    EmployeeName = g.Select(x => x.Employee.FullName).FirstOrDefault() ?? "Нема імені",
                     Count = g.Count()
                 })
                 .ToListAsync();

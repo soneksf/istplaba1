@@ -15,9 +15,7 @@ namespace LibraryDomain.Validation
 
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
-            // Get the current EndDate value
             var currentValue = value as DateOnly?;
-            // Use reflection to get the StartDate property value
             PropertyInfo? property = validationContext.ObjectType.GetProperty(_comparisonProperty);
             if (property == null)
             {
@@ -25,7 +23,7 @@ namespace LibraryDomain.Validation
             }
             var comparisonValue = property.GetValue(validationContext.ObjectInstance) as DateOnly?;
 
-            // Only perform the check if both dates have values
+            
             if (currentValue.HasValue && comparisonValue.HasValue)
             {
                 if (currentValue.Value < comparisonValue.Value)

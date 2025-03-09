@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryDomain.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -13,10 +14,13 @@ public partial class Position : Entity
 
 
     [Display(Name = "Дата початку роботи")]
+    [Required(ErrorMessage = "Поле не повинно бути порожнім")]
+    [PastOrYesterdayDate(ErrorMessage = "Дата початку не може бути пізніше сьогоднішнього дня.")]
     public DateOnly? StartDate { get; set; }
 
 
     [Display(Name = "Дата закінчення")]
+    [DateGreaterThan(nameof(StartDate), ErrorMessage = "Дата закінчення має бути пізніше дати початку.")]
     public DateOnly? EndDate { get; set; }
 
 

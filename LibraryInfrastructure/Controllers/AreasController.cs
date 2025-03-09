@@ -53,7 +53,7 @@ namespace LibraryInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("AreaName,Id")] Area area)
         {
-            // Check if an area with the same name already exists.
+            
             if (_context.Areas.Any(a => a.AreaName == area.AreaName))
             {
                 ModelState.AddModelError("AreaName", "Дослідна область з такою назвою вже існує.");
@@ -94,7 +94,7 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            // Check for duplicate AreaName excluding the current record.
+            
             if (_context.Areas.Any(a => a.AreaName == area.AreaName && a.Id != area.Id))
             {
                 ModelState.AddModelError("AreaName", "Дослідна область з такою назвою вже існує.");

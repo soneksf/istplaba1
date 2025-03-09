@@ -41,7 +41,7 @@ namespace LibraryInfrastructure.Controllers
             }
 
             return RedirectToAction("Index", "Employees", new { departmentId = department.Id, departmentName = department.DepartmentName });
-            //return View(department);
+            
         }
 
         // GET: Departments/Create
@@ -101,7 +101,7 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            // Check for duplicates, excluding the current department record
+            
             if (_context.Departments.Any(d => d.DepartmentName == department.DepartmentName && d.Id != department.Id))
             {
                 ModelState.AddModelError("DepartmentName", "Відділ з такою назвою вже існує.");
@@ -171,8 +171,7 @@ namespace LibraryInfrastructure.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-            /*await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));*/
+            
         }
 
         private bool DepartmentExists(int id)

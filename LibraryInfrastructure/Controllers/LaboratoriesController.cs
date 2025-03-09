@@ -53,7 +53,7 @@ namespace LibraryInfrastructure.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("LabNumber,Id")] Laboratory laboratory)
         {
-            // Check if a laboratory with the same LabNumber already exists
+            
             if (_context.Laboratories.Any(l => l.LabNumber == laboratory.LabNumber))
             {
                 ModelState.AddModelError("LabNumber", "Лабораторія з таким номером вже існує.");
@@ -94,7 +94,7 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            // Check for duplicates, excluding the current laboratory record
+            
             if (_context.Laboratories.Any(l => l.LabNumber == laboratory.LabNumber && l.Id != laboratory.Id))
             {
                 ModelState.AddModelError("LabNumber", "Лабораторія з таким номером вже існує.");
