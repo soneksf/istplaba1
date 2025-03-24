@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
 using LibraryInfrastructure;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LibraryInfrastructure.Controllers
 {
@@ -20,13 +17,17 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: ResearchWorks
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var dblibraryContext = _context.ResearchWorks.Include(r => r.Area).Include(r => r.Employee);
+            var dblibraryContext = _context.ResearchWorks
+                .Include(r => r.Area)
+                .Include(r => r.Employee);
             return View(await dblibraryContext.ToListAsync());
         }
 
         // GET: ResearchWorks/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -44,11 +45,13 @@ namespace LibraryInfrastructure.Controllers
             }
 
             int departmentId = researchWork.Employee.DepartmentId;
-
+            // Якщо потрібно перенаправляти на деталі кафедри:
             return RedirectToAction("Details", "Departments", new { id = departmentId });
+            // Або просто: return View(researchWork);
         }
 
         // GET: ResearchWorks/Create
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName");
@@ -59,9 +62,9 @@ namespace LibraryInfrastructure.Controllers
         // POST: ResearchWorks/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create([Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
         {
-            // Check if a research work with the same Title already exists
             if (_context.ResearchWorks.Any(r => r.Title == researchWork.Title))
             {
                 ModelState.AddModelError("Title", "Дослідницька робота з таким заголовком вже існує.");
@@ -79,6 +82,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: ResearchWorks/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -99,6 +103,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: ResearchWorks/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
         {
             if (id != researchWork.Id)
@@ -106,7 +111,6 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            // Check for duplicate Title excluding the current record
             if (_context.ResearchWorks.Any(r => r.Title == researchWork.Title && r.Id != researchWork.Id))
             {
                 ModelState.AddModelError("Title", "Дослідницька робота з таким заголовком вже існує.");
@@ -138,6 +142,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: ResearchWorks/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -160,6 +165,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: ResearchWorks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var researchWork = await _context.ResearchWorks.FindAsync(id);

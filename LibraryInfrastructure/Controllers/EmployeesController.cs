@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization; // Додаємо для використання [Authorize]
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
@@ -16,6 +17,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees
+        [AllowAnonymous] // або без атрибуту, якщо за замовчуванням усім дозволено
         public async Task<IActionResult> Index()
         {
             var employees = await _context.Employees
@@ -26,6 +28,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees/Details/5
+        [AllowAnonymous] // дозволяє переглядати деталі неавторизованим
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -40,6 +43,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees/Create
+        [Authorize] // лише авторизовані можуть створювати
         public IActionResult Create()
         {
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName");
@@ -50,14 +54,9 @@ namespace LibraryInfrastructure.Controllers
         // POST: Employees/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize] // лише авторизовані можуть створювати
         public async Task<IActionResult> Create([Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
-            // Check for duplicate FullName
-            if (_context.Employees.Any(e => e.FullName == employee.FullName))
-            {
-                ModelState.AddModelError("FullName", "Працівник з таким ім'ям вже існує.");
-            }
-
             if (ModelState.IsValid)
             {
                 _context.Add(employee);
@@ -71,6 +70,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees/Edit/5
+        [Authorize] // лише авторизовані можуть редагувати
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -86,15 +86,10 @@ namespace LibraryInfrastructure.Controllers
         // POST: Employees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize] // лише авторизовані можуть редагувати
         public async Task<IActionResult> Edit(int id, [Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
             if (id != employee.Id) return NotFound();
-
-            
-            if (_context.Employees.Any(e => e.FullName == employee.FullName && e.Id != employee.Id))
-            {
-                ModelState.AddModelError("FullName", "Працівник з таким ім'ям вже існує.");
-            }
 
             if (ModelState.IsValid)
             {
@@ -117,6 +112,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees/Delete/5
+        [Authorize] // лише авторизовані можуть видаляти
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -133,6 +129,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize] // лише авторизовані можуть видаляти
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employee = await _context.Employees.FindAsync(id);

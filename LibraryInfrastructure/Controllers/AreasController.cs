@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
@@ -19,30 +16,26 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Areas
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Areas.ToListAsync());
         }
 
         // GET: Areas/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var area = await _context.Areas
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (area == null)
-            {
-                return NotFound();
-            }
+            var area = await _context.Areas.FirstOrDefaultAsync(m => m.Id == id);
+            if (area == null) return NotFound();
 
             return View(area);
         }
 
         // GET: Areas/Create
+        [Authorize] // лише авторизовані можуть створювати
         public IActionResult Create()
         {
             return View();
@@ -51,9 +44,10 @@ namespace LibraryInfrastructure.Controllers
         // POST: Areas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize] // лише авторизовані можуть створювати
         public async Task<IActionResult> Create([Bind("AreaName,Id")] Area area)
         {
-            
+            // Перевірка на дублікати
             if (_context.Areas.Any(a => a.AreaName == area.AreaName))
             {
                 ModelState.AddModelError("AreaName", "Дослідна область з такою назвою вже існує.");
@@ -69,32 +63,26 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Areas/Edit/5
+        [Authorize] // лише авторизовані можуть редагувати
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
             var area = await _context.Areas.FindAsync(id);
-            if (area == null)
-            {
-                return NotFound();
-            }
+            if (area == null) return NotFound();
+
             return View(area);
         }
 
         // POST: Areas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize] // лише авторизовані можуть редагувати
         public async Task<IActionResult> Edit(int id, [Bind("AreaName,Id")] Area area)
         {
-            if (id != area.Id)
-            {
-                return NotFound();
-            }
+            if (id != area.Id) return NotFound();
 
-            
+            // Перевірка на дублікати
             if (_context.Areas.Any(a => a.AreaName == area.AreaName && a.Id != area.Id))
             {
                 ModelState.AddModelError("AreaName", "Дослідна область з такою назвою вже існує.");
@@ -109,14 +97,8 @@ namespace LibraryInfrastructure.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!AreaExists(area.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    if (!AreaExists(area.Id)) return NotFound();
+                    else throw;
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -124,19 +106,13 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Areas/Delete/5
+        [Authorize] // лише авторизовані можуть видаляти
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
 
-            var area = await _context.Areas
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (area == null)
-            {
-                return NotFound();
-            }
+            var area = await _context.Areas.FirstOrDefaultAsync(m => m.Id == id);
+            if (area == null) return NotFound();
 
             return View(area);
         }
@@ -144,13 +120,12 @@ namespace LibraryInfrastructure.Controllers
         // POST: Areas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize] // лише авторизовані можуть видаляти
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var area = await _context.Areas.FindAsync(id);
-            if (area == null)
-            {
-                return NotFound();
-            }
+            if (area == null) return NotFound();
+
             try
             {
                 _context.Areas.Remove(area);

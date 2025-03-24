@@ -5,15 +5,22 @@
 }
 
 <h1>Лабораторії</h1>
+
 @if (TempData["DeleteError"] != null)
 {
     <div class="alert alert-danger">
         @TempData["DeleteError"]
     </div>
 }
-<p>
-    <a asp-action="Create">Створити новий</a>
-</p>
+
+<!-- Кнопка "Створити нову" показується лише для авторизованих -->
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        <a asp-action="Create">Створити нову</a>
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
@@ -31,9 +38,19 @@
                     @Html.DisplayFor(modelItem => item.LabNumber)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
-                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                    <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a>
+                        <span> | </span>
+                    }
+
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                    }
                 </td>
             </tr>
         }

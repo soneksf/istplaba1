@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
 using LibraryInfrastructure;
@@ -20,12 +16,14 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Departments
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Departments.ToListAsync());
         }
 
         // GET: Departments/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -40,24 +38,25 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
+            // Перенаправляємо на сторінку з переліком працівників за кафедрою,
+            // якщо це необхідно – інакше можна повернути View(department)
             return RedirectToAction("Index", "Employees", new { departmentId = department.Id, departmentName = department.DepartmentName });
-            
         }
 
         // GET: Departments/Create
+        [Authorize] // лише авторизовані можуть створювати кафедри
         public IActionResult Create()
         {
             return View();
         }
 
         // POST: Departments/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create([Bind("DepartmentName,Id")] Department department)
         {
-            // Check if a department with the same name already exists
+            // Перевірка на дублікати
             if (_context.Departments.Any(d => d.DepartmentName == department.DepartmentName))
             {
                 ModelState.AddModelError("DepartmentName", "Відділ з такою назвою вже існує.");
@@ -72,8 +71,8 @@ namespace LibraryInfrastructure.Controllers
             return View(department);
         }
 
-
         // GET: Departments/Edit/5
+        [Authorize] // лише авторизовані можуть редагувати
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -90,10 +89,9 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: Departments/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("DepartmentName,Id")] Department department)
         {
             if (id != department.Id)
@@ -101,7 +99,6 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            
             if (_context.Departments.Any(d => d.DepartmentName == department.DepartmentName && d.Id != department.Id))
             {
                 ModelState.AddModelError("DepartmentName", "Відділ з такою назвою вже існує.");
@@ -130,8 +127,8 @@ namespace LibraryInfrastructure.Controllers
             return View(department);
         }
 
-
         // GET: Departments/Delete/5
+        [Authorize] // лише авторизовані можуть видаляти
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -152,12 +149,13 @@ namespace LibraryInfrastructure.Controllers
         // POST: Departments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var department = await _context.Departments.FindAsync(id);
-            if (department != null)
+            if (department == null)
             {
-                _context.Departments.Remove(department);
+                return NotFound();
             }
             try
             {
@@ -166,12 +164,11 @@ namespace LibraryInfrastructure.Controllers
             }
             catch (DbUpdateException)
             {
-                TempData["DeleteError"] = "Неможливо видалити дослідницьку роботу, оскільки існують пов'язані записи.";
+                TempData["DeleteError"] = "Неможливо видалити дослідницьку область, оскільки існують пов'язані записи.";
                 return RedirectToAction(nameof(Index));
             }
 
             return RedirectToAction(nameof(Index));
-            
         }
 
         private bool DepartmentExists(int id)

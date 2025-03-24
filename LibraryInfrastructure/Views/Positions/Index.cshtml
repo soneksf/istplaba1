@@ -5,54 +5,58 @@
 }
 
 <h1>Посада</h1>
+
 @if (TempData["DeleteError"] != null)
 {
     <div class="alert alert-danger">
         @TempData["DeleteError"]
     </div>
 }
-<p>
-    <a asp-action="Create">Створити новий</a>
-</p>
+
+<!-- Кнопка "Створити нового" показується лише для авторизованих -->
+@if (User.Identity.IsAuthenticated)
+{
+    <p>
+        <a asp-action="Create">Створити нового</a>
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.PositionName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StartDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.EndDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Employee)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.PositionName)</th>
+            <th>@Html.DisplayNameFor(model => model.StartDate)</th>
+            <th>@Html.DisplayNameFor(model => model.EndDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Employee)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.PositionName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Employee.FullName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Деталі</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.PositionName)</td>
+                <td>@Html.DisplayFor(modelItem => item.StartDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.EndDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
+                <td>
+                    <!-- "Змінити" і "Видалити" показувати лише для авторизованих -->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a>
+                        <span> | </span>
+                    }
+
+                    <!-- "Деталі" доступні всім -->
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <span> | </span>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

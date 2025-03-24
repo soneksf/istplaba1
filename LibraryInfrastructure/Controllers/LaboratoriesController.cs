@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
@@ -19,12 +16,14 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Laboratories
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             return View(await _context.Laboratories.ToListAsync());
         }
 
         // GET: Laboratories/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -43,6 +42,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Laboratories/Create
+        [Authorize]
         public IActionResult Create()
         {
             return View();
@@ -51,9 +51,9 @@ namespace LibraryInfrastructure.Controllers
         // POST: Laboratories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create([Bind("LabNumber,Id")] Laboratory laboratory)
         {
-            
             if (_context.Laboratories.Any(l => l.LabNumber == laboratory.LabNumber))
             {
                 ModelState.AddModelError("LabNumber", "Лабораторія з таким номером вже існує.");
@@ -69,6 +69,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Laboratories/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -87,6 +88,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Laboratories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("LabNumber,Id")] Laboratory laboratory)
         {
             if (id != laboratory.Id)
@@ -94,7 +96,6 @@ namespace LibraryInfrastructure.Controllers
                 return NotFound();
             }
 
-            
             if (_context.Laboratories.Any(l => l.LabNumber == laboratory.LabNumber && l.Id != laboratory.Id))
             {
                 ModelState.AddModelError("LabNumber", "Лабораторія з таким номером вже існує.");
@@ -124,6 +125,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Laboratories/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -144,6 +146,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Laboratories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var laboratory = await _context.Laboratories.FindAsync(id);

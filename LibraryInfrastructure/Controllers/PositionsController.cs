@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using LibraryDomain.Models;
 using LibraryInfrastructure;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LibraryInfrastructure.Controllers
 {
@@ -20,14 +17,17 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Positions
+        // Доступний усім
+        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             var dblibraryContext = _context.Positions.Include(p => p.Employee);
             return View(await dblibraryContext.ToListAsync());
-           // return View(dblibraryContext);
         }
 
         // GET: Positions/Details/5
+        // Доступний усім
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -47,6 +47,8 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Positions/Create
+        // Лише для авторизованих користувачів
+        [Authorize]
         public IActionResult Create(int? employeeId)
         {
             if (employeeId.HasValue)
@@ -61,21 +63,17 @@ namespace LibraryInfrastructure.Controllers
             return View();
         }
 
-
         // POST: Positions/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Create([Bind("Id,PositionName,StartDate,EndDate,EmployeeId")] Position position)
         {
-            // Check if the same position already exists for this employee
-            bool positionExists = _context.Positions
-                .Any(p => p.EmployeeId == position.EmployeeId && p.PositionName == position.PositionName);
-
+            // Перевірка: для одного працівника може бути лише одна посада
+            bool positionExists = _context.Positions.Any(p => p.EmployeeId == position.EmployeeId);
             if (positionExists)
             {
-                ModelState.AddModelError("PositionName", "Цей працівник вже має таку посаду.");
+                ModelState.AddModelError("EmployeeId", "This employee already has a position.");
             }
 
             if (ModelState.IsValid)
@@ -84,13 +82,12 @@ namespace LibraryInfrastructure.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
             ViewData["EmployeeId"] = new SelectList(_context.Employees, "Id", "FullName", position.EmployeeId);
             return View(position);
         }
 
-
         // GET: Positions/Edit/5
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -108,15 +105,21 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // POST: Positions/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [Bind("Id,PositionName,StartDate,EndDate,EmployeeId")] Position position)
         {
             if (id != position.Id)
             {
                 return NotFound();
+            }
+
+            // Перевірка: інша посада для цього працівника не повинна існувати
+            bool positionExists = _context.Positions.Any(p => p.EmployeeId == position.EmployeeId && p.Id != position.Id);
+            if (positionExists)
+            {
+                ModelState.AddModelError("EmployeeId", "This employee already has a position.");
             }
 
             if (ModelState.IsValid)
@@ -144,6 +147,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Positions/Delete/5
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -165,6 +169,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Positions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var position = await _context.Positions.FindAsync(id);
@@ -174,7 +179,6 @@ namespace LibraryInfrastructure.Controllers
             }
             try
             {
-                _context.Positions.Remove(position);
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateException)
@@ -184,7 +188,6 @@ namespace LibraryInfrastructure.Controllers
             }
 
             return RedirectToAction(nameof(Index));
-           
         }
 
         private bool PositionExists(int id)

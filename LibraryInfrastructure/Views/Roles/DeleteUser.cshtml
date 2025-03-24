@@ -1,0 +1,15 @@
+﻿@model LibraryDomain.Models.User
+
+@{
+    ViewData["Title"] = "Видалення користувача";
+}
+
+<h2>Видалення користувача</h2>
+
+<p>Ви впевнені, що хочете видалити користувача з email: <strong>@Model.Email</strong>?</p>
+
+<form asp-action="DeleteUser" method="post">
+    <input type="hidden" name="userId" value="@Model.Id" />
+    <button type="submit" class="btn btn-danger">Так, видалити</button>
+    <a asp-action="UserList" class="btn btn-secondary">Скасувати</a>
+</form>

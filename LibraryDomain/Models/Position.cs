@@ -10,6 +10,7 @@ public partial class Position : Entity
     
     [Required(ErrorMessage = "Поле не повинно бути порожнім")]
     [Display(Name = "Поcада працівника")]
+
     public string PositionName { get; set; } = null!;
 
 

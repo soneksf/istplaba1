@@ -24,7 +24,7 @@ namespace LibraryInfrastructure
         public virtual DbSet<ResearchWork> ResearchWorks { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+#warning To protect potentially sensitive information in your connection string, move it out of source code.
             => optionsBuilder.UseSqlServer("Server=LAPTOP-KPQDMGDB\\SQLEXPRESS; Database=DBLibrary; Trusted_Connection=True; TrustServerCertificate=True;");
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -68,8 +68,7 @@ namespace LibraryInfrastructure
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                // Add a unique index for FullName
-                entity.HasIndex(e => e.FullName).IsUnique();
+                
 
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.Employees)
@@ -106,12 +105,16 @@ namespace LibraryInfrastructure
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
+                // Enforce one position per employee at the database level:
+                entity.HasIndex(e => e.EmployeeId).IsUnique();
+
                 entity.HasOne(d => d.Employee)
                     .WithMany(p => p.Positions)
                     .HasForeignKey(d => d.EmployeeId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Position_Employee");
             });
+
 
             modelBuilder.Entity<ResearchWork>(entity =>
             {
