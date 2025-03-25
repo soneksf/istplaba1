@@ -8,6 +8,7 @@ namespace LibraryInfrastructure.Controllers
 {
     public class DepartmentsController : Controller
     {
+
         private readonly DblibraryContext _context;
 
         public DepartmentsController(DblibraryContext context)
@@ -44,7 +45,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Departments/Create
-        [Authorize] // лише авторизовані можуть створювати кафедри
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             return View();
@@ -53,7 +54,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Departments/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create([Bind("DepartmentName,Id")] Department department)
         {
             // Перевірка на дублікати
@@ -72,7 +73,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Departments/Edit/5
-        [Authorize] // лише авторизовані можуть редагувати
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -91,7 +92,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Departments/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("DepartmentName,Id")] Department department)
         {
             if (id != department.Id)
@@ -128,7 +129,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Departments/Delete/5
-        [Authorize] // лише авторизовані можуть видаляти
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -149,7 +150,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Departments/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var department = await _context.Departments.FindAsync(id);

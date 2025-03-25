@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LibraryInfrastructure.Controllers
 {
+
     public class PositionsController : Controller
     {
         private readonly DblibraryContext _context;
@@ -48,7 +49,7 @@ namespace LibraryInfrastructure.Controllers
 
         // GET: Positions/Create
         // Лише для авторизованих користувачів
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public IActionResult Create(int? employeeId)
         {
             if (employeeId.HasValue)
@@ -66,7 +67,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Positions/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create([Bind("Id,PositionName,StartDate,EndDate,EmployeeId")] Position position)
         {
             // Перевірка: для одного працівника може бути лише одна посада
@@ -87,7 +88,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Positions/Edit/5
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -107,7 +108,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Positions/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Id,PositionName,StartDate,EndDate,EmployeeId")] Position position)
         {
             if (id != position.Id)
@@ -147,7 +148,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Positions/Delete/5
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -169,7 +170,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Positions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var position = await _context.Positions.FindAsync(id);

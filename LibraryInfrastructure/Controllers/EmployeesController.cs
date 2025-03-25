@@ -9,6 +9,7 @@ namespace LibraryInfrastructure.Controllers
 {
     public class EmployeesController : Controller
     {
+
         private readonly DblibraryContext _context;
 
         public EmployeesController(DblibraryContext context)
@@ -43,7 +44,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees/Create
-        [Authorize] // лише авторизовані можуть створювати
+        [Authorize(Roles = "admin")] // лише авторизовані можуть створювати
         public IActionResult Create()
         {
             ViewData["DepartmentId"] = new SelectList(_context.Departments, "Id", "DepartmentName");
@@ -54,7 +55,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Employees/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize] // лише авторизовані можуть створювати
+        [Authorize(Roles = "admin")] // лише авторизовані можуть створювати
         public async Task<IActionResult> Create([Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
             if (ModelState.IsValid)
@@ -70,7 +71,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees/Edit/5
-        [Authorize] // лише авторизовані можуть редагувати
+        [Authorize(Roles = "admin")] // лише авторизовані можуть редагувати
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -86,7 +87,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Employees/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize] // лише авторизовані можуть редагувати
+        [Authorize(Roles = "admin")] // лише авторизовані можуть редагувати
         public async Task<IActionResult> Edit(int id, [Bind("FullName,Faculty,StartDate,EndDate,DepartmentId,LabId,Id")] Employee employee)
         {
             if (id != employee.Id) return NotFound();
@@ -112,7 +113,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Employees/Delete/5
-        [Authorize] // лише авторизовані можуть видаляти
+        [Authorize(Roles = "admin")] // лише авторизовані можуть видаляти
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -129,7 +130,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Employees/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize] // лише авторизовані можуть видаляти
+        [Authorize(Roles = "admin")] // лише авторизовані можуть видаляти
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var employee = await _context.Employees.FindAsync(id);

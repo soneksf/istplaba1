@@ -14,7 +14,7 @@
 }
 
 <!-- "Створити новий" доступний лише авторизованим -->
-@if (User.Identity.IsAuthenticated)
+@if (User.IsInRole("admin"))
 {
     <p>
         <a asp-action="Create">Створити новий</a>
@@ -39,7 +39,7 @@
                 </td>
                 <td>
                     <!-- Кнопки "Змінити" та "Видалити" показувати лише авторизованим -->
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.IsInRole("admin"))
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a>
                         <span> | </span>
@@ -48,7 +48,7 @@
                     <!-- "Деталі" доступні всім -->
                     <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
 
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.IsInRole("admin"))
                     {
                         <span> | </span>
                         <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>

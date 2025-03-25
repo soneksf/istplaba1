@@ -9,6 +9,7 @@ namespace LibraryInfrastructure.Controllers
 {
     public class ResearchWorksController : Controller
     {
+
         private readonly DblibraryContext _context;
 
         public ResearchWorksController(DblibraryContext context)
@@ -51,7 +52,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: ResearchWorks/Create
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             ViewData["AreaId"] = new SelectList(_context.Areas, "Id", "AreaName");
@@ -62,7 +63,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: ResearchWorks/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create([Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
         {
             if (_context.ResearchWorks.Any(r => r.Title == researchWork.Title))
@@ -82,7 +83,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: ResearchWorks/Edit/5
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -103,7 +104,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: ResearchWorks/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("Title,EmployeeId,AreaId,Id")] ResearchWork researchWork)
         {
             if (id != researchWork.Id)
@@ -142,7 +143,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: ResearchWorks/Delete/5
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -165,7 +166,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: ResearchWorks/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var researchWork = await _context.ResearchWorks.FindAsync(id);

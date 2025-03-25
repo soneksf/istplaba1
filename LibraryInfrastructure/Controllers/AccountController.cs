@@ -38,19 +38,21 @@ namespace LibraryInfrastructure.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Створюємо користувача без підтвердження пошти
+                // Створюємо користувача, який за замовчуванням не має ролі admin
                 var user = new User
                 {
                     Email = model.Email,
                     UserName = model.Email
-                    // Year = model.Year // якщо потрібно
+                    // Якщо є інші властивості, наприклад, Year, їх теж присвоюємо
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    // Без підтвердження електронної пошти – одразу переходимо
-                    // Наприклад, на головну сторінку або сторінку входу
+                    // Присвоюємо новому користувачу роль "user"
+                    await _userManager.AddToRoleAsync(user, "user");
+
+                    // Ви можете тут одразу авторизувати користувача, або направити на сторінку входу
                     return RedirectToAction("Index", "ResearchWorks");
                 }
                 foreach (var error in result.Errors)
@@ -99,111 +101,13 @@ namespace LibraryInfrastructure.Controllers
             await _signInManager.SignOutAsync();
             return RedirectToAction("Index", "ResearchWorks");
         }
-
-        // GET: /Account/ForgotPassword
         [HttpGet]
         [AllowAnonymous]
         public IActionResult ForgotPassword()
         {
             return View();
         }
-
-        // POST: /Account/ForgotPassword
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                // Знаходимо користувача за Email
-                var user = await _userManager.FindByEmailAsync(model.Email);
-                // Якщо користувача не знайдено, не розкриваємо цього
-                if (user == null /*або якщо хочете перевіряти IsEmailConfirmed, видаліть якщо не потрібно*/)
-                {
-                    return RedirectToAction("ForgotPasswordConfirmation", "Account");
-                }
-
-                // Генеруємо токен для скидання пароля
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                var callbackUrl = Url.Action(
-                    "ResetPassword",
-                    "Account",
-                    new { userId = user.Id, code = token },
-                    protocol: HttpContext.Request.Scheme);
-
-                // Надсилаємо лист для скидання пароля (залишається, якщо вам потрібні листи)
-                await _emailSender.SendEmailAsync(model.Email, "Скидання пароля",
-                    $"Будь ласка, скиньте свій пароль, перейшовши за посиланням: <a href='{callbackUrl}'>натисніть тут</a>");
-
-                return RedirectToAction("ForgotPasswordConfirmation", "Account");
-            }
-            return View(model);
-        }
-
-        // GET: /Account/ForgotPasswordConfirmation
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ForgotPasswordConfirmation()
-        {
-            return View();
-        }
-
-        // GET: /Account/ResetPassword
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPassword(string code = null)
-        {
-            if (code == null)
-            {
-                return BadRequest("Не передано коду для скидання пароля.");
-            }
-            var model = new ResetPasswordViewModel { Code = code };
-            return View(model);
-        }
-
-        // POST: /Account/ResetPassword
-        [HttpPost]
-        [AllowAnonymous]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            var user = await _userManager.FindByEmailAsync(model.Email);
-            if (user == null)
-            {
-                // Не повідомляємо, що користувача не знайдено
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
-            var result = await _userManager.ResetPasswordAsync(user, model.Code, model.Password);
-            if (result.Succeeded)
-            {
-                return RedirectToAction("ResetPasswordConfirmation", "Account");
-            }
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError("", error.Description);
-            }
-            return View(model);
-        }
-
-        // GET: /Account/ResetPasswordConfirmation
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult ResetPasswordConfirmation()
-        {
-            return View();
-        }
-
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
+       
 
     }
 }

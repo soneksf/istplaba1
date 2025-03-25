@@ -8,6 +8,7 @@ namespace LibraryInfrastructure.Controllers
 {
     public class LaboratoriesController : Controller
     {
+
         private readonly DblibraryContext _context;
 
         public LaboratoriesController(DblibraryContext context)
@@ -42,7 +43,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Laboratories/Create
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             return View();
@@ -51,7 +52,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Laboratories/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create([Bind("LabNumber,Id")] Laboratory laboratory)
         {
             if (_context.Laboratories.Any(l => l.LabNumber == laboratory.LabNumber))
@@ -69,7 +70,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Laboratories/Edit/5
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -88,7 +89,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Laboratories/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("LabNumber,Id")] Laboratory laboratory)
         {
             if (id != laboratory.Id)
@@ -125,7 +126,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Laboratories/Delete/5
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -146,7 +147,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Laboratories/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize]
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var laboratory = await _context.Laboratories.FindAsync(id);

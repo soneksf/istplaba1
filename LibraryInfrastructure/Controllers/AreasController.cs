@@ -6,6 +6,7 @@ using LibraryInfrastructure;
 
 namespace LibraryInfrastructure.Controllers
 {
+
     public class AreasController : Controller
     {
         private readonly DblibraryContext _context;
@@ -35,7 +36,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Areas/Create
-        [Authorize] // лише авторизовані можуть створювати
+        [Authorize(Roles = "admin")]
         public IActionResult Create()
         {
             return View();
@@ -44,7 +45,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Areas/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize] // лише авторизовані можуть створювати
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Create([Bind("AreaName,Id")] Area area)
         {
             // Перевірка на дублікати
@@ -63,7 +64,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Areas/Edit/5
-        [Authorize] // лише авторизовані можуть редагувати
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -77,7 +78,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Areas/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize] // лише авторизовані можуть редагувати
+        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Edit(int id, [Bind("AreaName,Id")] Area area)
         {
             if (id != area.Id) return NotFound();
@@ -106,7 +107,7 @@ namespace LibraryInfrastructure.Controllers
         }
 
         // GET: Areas/Delete/5
-        [Authorize] // лише авторизовані можуть видаляти
+        [Authorize(Roles = "admin")] // лише авторизовані можуть видаляти
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -120,7 +121,7 @@ namespace LibraryInfrastructure.Controllers
         // POST: Areas/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [Authorize] // лише авторизовані можуть видаляти
+        [Authorize(Roles = "admin")] // лише авторизовані можуть видаляти
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var area = await _context.Areas.FindAsync(id);

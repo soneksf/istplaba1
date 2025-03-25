@@ -14,7 +14,7 @@
 }
 
 <!-- Кнопка "Створити нового" показується лише для авторизованих -->
-@if (User.Identity.IsAuthenticated)
+@if (User.IsInRole("admin"))
 {
     <p>
         <a asp-action="Create">Створити нового</a>
@@ -41,7 +41,7 @@
                 <td>@Html.DisplayFor(modelItem => item.Employee.FullName)</td>
                 <td>
                     <!-- "Змінити" і "Видалити" показувати лише для авторизованих -->
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.IsInRole("admin"))
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a>
                         <span> | </span>
@@ -50,7 +50,7 @@
                     <!-- "Деталі" доступні всім -->
                     <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
 
-                    @if (User.Identity.IsAuthenticated)
+                    @if (User.IsInRole("admin"))
                     {
                         <span> | </span>
                         <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>

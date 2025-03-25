@@ -10,12 +10,11 @@ using LibraryInfrastructure.ViewModel;
 
 namespace LibraryInfrastructure.Controllers
 {
-    [Authorize] // Загалом доступ до ролей доступний лише авторизованим користувачам
+    [Authorize(Roles = "admin")]
     public class RolesController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<User> _userManager;
-        // Задайте тут свою адресу адміністратора, для якої дозволено змінювати ролі
         private const string AllowedAdminEmail = "admin1@gmail.com";
 
         public RolesController(RoleManager<IdentityRole> roleManager, UserManager<User> userManager)
@@ -31,13 +30,11 @@ namespace LibraryInfrastructure.Controllers
         // GET: Roles/Edit?userId=...
         public async Task<IActionResult> Edit(string userId)
         {
-            // Перевіряємо, чи поточний користувач має адресу AllowedAdminEmail
             if (User.Identity?.Name?.ToLower() != AllowedAdminEmail.ToLower())
             {
                 return Forbid();
             }
 
-            // Отримуємо користувача, для якого потрібно змінити ролі
             User user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
@@ -57,7 +54,7 @@ namespace LibraryInfrastructure.Controllers
 
         // POST: Roles/Edit
         [HttpPost]
-        public async Task<IActionResult> Edit(string userId, List<string> roles)
+        public async Task<IActionResult> Edit(string userId, string selectedRole)
         {
             // Перевіряємо, чи поточний користувач має адресу AllowedAdminEmail
             if (User.Identity?.Name?.ToLower() != AllowedAdminEmail.ToLower())
@@ -68,21 +65,25 @@ namespace LibraryInfrastructure.Controllers
             User user = await _userManager.FindByIdAsync(userId);
             if (user != null)
             {
+                // Отримуємо всі ролі, які були у користувача
                 var userRoles = await _userManager.GetRolesAsync(user);
-                // Список ролей, які було додано
-                var addedRoles = roles.Except(userRoles);
-                // Список ролей, які було видалено
-                var removedRoles = userRoles.Except(roles);
 
-                await _userManager.AddToRolesAsync(user, addedRoles);
-                await _userManager.RemoveFromRolesAsync(user, removedRoles);
+                // Видаляємо всі ролі
+                await _userManager.RemoveFromRolesAsync(user, userRoles);
+
+                // Додаємо лише одну обрану роль, якщо користувач вибрав її
+                if (!string.IsNullOrEmpty(selectedRole))
+                {
+                    await _userManager.AddToRoleAsync(user, selectedRole);
+                }
 
                 return RedirectToAction("UserList");
             }
             return NotFound();
         }
 
-        // POST: Roles/Delete (для видалення ролей)
+
+        // POST: Roles/Delete (видалення ролей)
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
@@ -98,11 +99,11 @@ namespace LibraryInfrastructure.Controllers
             return RedirectToAction("Index");
         }
 
-        // Новий метод: GET: Roles/DeleteUser?userId=...
+        // GET: Roles/DeleteUser?userId=...
         [HttpGet]
         public async Task<IActionResult> DeleteUser(string userId)
         {
-            // Перевірка прав адміністратора
+            // Перевірка: лише користувач з AllowedAdminEmail має доступ
             if (User.Identity?.Name?.ToLower() != AllowedAdminEmail.ToLower())
             {
                 return Forbid();
@@ -116,10 +117,10 @@ namespace LibraryInfrastructure.Controllers
             {
                 return NotFound();
             }
-            return View(user); // Створіть представлення DeleteUser.cshtml для підтвердження видалення
+            return View(user); // Представлення DeleteUser.cshtml для підтвердження видалення
         }
 
-        // Новий метод: POST: Roles/DeleteUser
+        // POST: Roles/DeleteUser (видалення користувача)
         [HttpPost, ActionName("DeleteUser")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteUserConfirmed(string userId)
@@ -133,6 +134,15 @@ namespace LibraryInfrastructure.Controllers
             {
                 return NotFound();
             }
+
+            // Забороняємо видалення "admin1@gmail.com"
+            if (user.Email?.ToLower() == "admin1@gmail.com")
+            {
+                ModelState.AddModelError("", "Неможливо видалити головного адміністратора!");
+                // Можна повернутись до списку користувачів або показати сторінку з помилкою
+                return RedirectToAction("UserList");
+            }
+
             var result = await _userManager.DeleteAsync(user);
             if (!result.Succeeded)
             {
@@ -141,5 +151,6 @@ namespace LibraryInfrastructure.Controllers
             }
             return RedirectToAction("UserList");
         }
+
     }
 }
