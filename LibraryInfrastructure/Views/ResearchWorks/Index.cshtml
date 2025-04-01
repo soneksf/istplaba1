@@ -13,11 +13,13 @@
     </div>
 }
 
-<!-- Кнопка "Створити нову" доступна лише адміністратору -->
+<!-- Адміністративні кнопки (створити, імпортувати, експортувати) відображаються лише для адміністраторів -->
 @if (User.IsInRole("admin"))
 {
     <p>
-        <a asp-action="Create">Створити нову</a>
+        <a class="btn btn-primary" asp-action="Create">Створити нову</a>
+        <a class="btn btn-secondary" asp-action="Import">Імпортувати</a>
+        <a class="btn btn-info" asp-action="Export">Експортувати</a>
     </p>
 }
 
@@ -38,21 +40,14 @@
                 <td>@Html.DisplayFor(_ => item.Area.AreaName)</td>
                 <td>@Html.DisplayFor(_ => item.Employee.FullName)</td>
                 <td>
-                    <!-- "Змінити" і "Видалити" показуються лише для адміністраторів -->
                     @if (User.IsInRole("admin"))
                     {
                         <a asp-action="Edit" asp-route-id="@item.Id">Змінити</a>
                         <span> | </span>
-                    }
-
-                    <!-- "Деталі" доступні всім -->
-                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
-
-                    @if (User.IsInRole("admin"))
-                    {
-                        <span> | </span>
                         <a asp-action="Delete" asp-route-id="@item.Id">Видалити</a>
+                        <span> | </span>
                     }
+                    <a asp-action="Details" asp-route-id="@item.Id">Деталі</a>
                 </td>
             </tr>
         }

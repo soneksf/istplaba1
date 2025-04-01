@@ -107,7 +107,14 @@ namespace LibraryInfrastructure.Controllers
         {
             return View();
         }
-       
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
 
     }
 }

@@ -1,0 +1,13 @@
+﻿@{
+    ViewData["Title"] = "Імпорт наукових робіт";
+}
+
+<h2>Імпорт наукових робіт</h2>
+<p>Оберіть Excel-файл для завантаження даних:</p>
+
+<form asp-action="ImportFile" asp-controller="ResearchWorks" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <input type="file" name="fileExcel" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Завантажити</button>
+</form>
